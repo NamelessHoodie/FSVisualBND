@@ -1,0 +1,52 @@
+﻿<Window x:Class="FSBndAnimationRegister.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FSBndAnimationRegister" 
+        xmlns:viewmodel="clr-namespace:FSBndAnimationRegister.MVVM.ViewModel"
+        xmlns:view="clr-namespace:FSBndAnimationRegister.MVVM.View"
+        xmlns:SF="clr-namespace:SoulsFormats;assembly=SoulsFormats"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800"
+        Background="#332c33" Foreground="#b0acac">
+    <Window.DataContext>
+        <viewmodel:MainViewModel/>
+    </Window.DataContext>
+
+    
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="21*"/>
+            <RowDefinition Height="19*"/>
+            <RowDefinition Height="394*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="99">
+            <MenuItem Header="File">
+                <MenuItem Header="Load BND" Click="Button_Click_LoadBinderFile"/>
+                <MenuItem Header="Save BND" Click="Menu_Item_Save_Simple"/>
+            </MenuItem>
+            <MenuItem Header="Edit">
+                <MenuItem Header="Duplicate" Click="Menu_Item_Duplicate"/>
+                <MenuItem Header="Remove File/Folder" Click="MenuItem_Click_Remove"/>
+                <MenuItem Header="Edit" Click="Menu_Item_Edit"/>
+                <MenuItem Header="Add File" Click="MenuItem_Click_Add_File"/>
+                <MenuItem Header="Add Folder" Click="MenuItem_Click_Add_Folder"/>
+            </MenuItem>
+            <MenuItem Header="Debug">
+                <MenuItem Header="DebugPrintRecursion" Click="MenuItem_Click_DebugPrintRecursion"/>
+                <MenuItem Header="DebugResetTree" Click="Menu_Item_DebugReset"/>
+            </MenuItem>
+        </Menu>
+        
+        <TreeView Background="Transparent" x:Name="FileBrowser"  Grid.ColumnSpan="4" SelectedItemChanged="FileBrowser_SelectedItemChanged" Grid.Row="1" Grid.RowSpan="2"/>
+    </Grid>
+</Window>

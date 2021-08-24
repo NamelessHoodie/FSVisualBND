@@ -1,0 +1,39 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    x:Class="FSBndAnimationRegister.EditDialog"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    WindowStartupLocation="CenterOwner" 
+    SizeToContent="WidthAndHeight"
+    MinWidth="300"
+    MinHeight="100"
+    WindowStyle="SingleBorderWindow"
+    ResizeMode="CanMinimize">
+
+    <StackPanel Margin="5,5,5,5">
+        <TextBlock Name="TitleTextBox" Margin="0,0,0,10" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="33*"/>
+                <ColumnDefinition Width="257*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock >ID</TextBlock>
+                <TextBlock >Name</TextBlock>
+                <TextBlock >Flags</TextBlock>
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+                <TextBox Name="InputTextBoxID"/>
+                <TextBox Name="InputTextBoxName"/>
+                <TextBox Name="InputTextBoxFlags"/>
+            </StackPanel>
+        </Grid>
+        <Grid Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Name="BtnOk" Content="Save" Grid.Column="0" Margin="0,0,5,0" Padding="8" Click="BtnSave_Click" />
+            <Button Name="BtnCancel" Content="Discard" Grid.Column="1" Margin="5,0,0,0" Padding="8" Click="BtnCancel_Click" />
+        </Grid>
+    </StackPanel>
+</Window>
+
