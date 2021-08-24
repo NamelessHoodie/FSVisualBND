@@ -8,7 +8,7 @@
         xmlns:view="clr-namespace:FSBndAnimationRegister.MVVM.View"
         xmlns:SF="clr-namespace:SoulsFormats;assembly=SoulsFormats"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="FSVisualBND" Height="450" Width="800"
         Background="#332c33" Foreground="#b0acac">
     <Window.DataContext>
         <viewmodel:MainViewModel/>
@@ -36,12 +36,13 @@
             </MenuItem>
             <MenuItem Header="Edit">
                 <MenuItem Header="Duplicate" Click="Menu_Item_Duplicate"/>
+                <MenuItem Header="Replace File" Click="Menu_Item_ReplaceFile"/>
                 <MenuItem Header="Remove File/Folder" Click="MenuItem_Click_Remove"/>
                 <MenuItem Header="Edit" Click="Menu_Item_Edit"/>
                 <MenuItem Header="Add File" Click="MenuItem_Click_Add_File"/>
                 <MenuItem Header="Add Folder" Click="MenuItem_Click_Add_Folder"/>
             </MenuItem>
-            <MenuItem Header="Debug">
+            <MenuItem Header="Debug" Visibility="Hidden">
                 <MenuItem Header="DebugPrintRecursion" Click="MenuItem_Click_DebugPrintRecursion"/>
                 <MenuItem Header="DebugResetTree" Click="Menu_Item_DebugReset"/>
             </MenuItem>

@@ -57,7 +57,6 @@ namespace FSBndAnimationRegister
                 LoadBinderFile(openFileDialog1.FileName);
             }
         }
-
         public void LoadBinderFile(string BndPath)
         {
             if (BND4.IsRead(BndPath, out BND4 binder4Selected))
@@ -105,7 +104,6 @@ namespace FSBndAnimationRegister
                 LoadBinderPathFolderToFileBrowser(bndRec, rootTreeViewItem);
             }
         }
-
         public void ReloadFileBrowser()
         {
             for (int i = 0; i < FileBrowser.Items.Count; i++)
@@ -117,7 +115,6 @@ namespace FSBndAnimationRegister
             FileBrowser.Items.Add(rootTreeViewItem);
             LoadBinderPathFolderToFileBrowser(DataContextViewModel.BinderPathFolderRoot, rootTreeViewItem);
         }
-
         public void LoadBinderPathFolderToFileBrowser(BinderPathFolder currentBinderPath, TreeViewItem currentTreeViewItem)
         {
             foreach (var (name, childFolder) in currentBinderPath.childFolders)
@@ -150,7 +147,6 @@ namespace FSBndAnimationRegister
             TreeViewItem newTreeViewItem = new TreeViewItem() { Header = stack, DataContext = currentBinderPath };
             treeViewItemParent.Items.Add(newTreeViewItem);
         }
-
         public void CreateTreeViewChildFromBinderPathFolder(BinderPathFolder currentBinderPath, TreeViewItem treeViewItemParent, int insertIndex)
         {
             StackPanel stack = new StackPanel() { Orientation = System.Windows.Controls.Orientation.Horizontal };
@@ -165,7 +161,6 @@ namespace FSBndAnimationRegister
             TreeViewItem newTreeViewItem = new TreeViewItem() { Header = stack, DataContext = currentBinderPath };
             treeViewItemParent.Items.Insert(insertIndex, newTreeViewItem);
         }
-
         private void FileBrowser_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             var treeView = (TreeView)sender;
@@ -179,7 +174,6 @@ namespace FSBndAnimationRegister
                 }
             }
         }
-
         private void MenuItem_Click_DebugPrintRecursion(object sender, RoutedEventArgs e)
         {
             Debug.WriteLine("DebugRecursionPrintout");
@@ -189,77 +183,101 @@ namespace FSBndAnimationRegister
                 Debug.WriteLine(item.ID);
             }
         }
-
         private void MenuItem_Click_Remove(object sender, RoutedEventArgs e)
         {
-
-            if (FileBrowser.SelectedItem != null)
+            if (!string.IsNullOrEmpty(LoadedBndPath) && FileBrowser.SelectedItem != null)
             {
-                TreeViewItem treeViewItem = (TreeViewItem)FileBrowser.SelectedItem;
+                if (FileBrowser.SelectedItem != null)
+                {
+                    TreeViewItem treeViewItem = (TreeViewItem)FileBrowser.SelectedItem;
 
-                var binderPathFolder = (BinderPathFolder)treeViewItem.DataContext;
-                if (binderPathFolder.Parent != null)
-                {
-                    foreach (var item in binderPathFolder.Parent.childFolders.Where(a => a.Key == binderPathFolder.Name))
+                    var binderPathFolder = (BinderPathFolder)treeViewItem.DataContext;
+                    if (binderPathFolder.Parent != null)
                     {
-                        binderPathFolder.Parent.childFolders.Remove(item);
+                        foreach (var item in binderPathFolder.Parent.childFolders.Where(a => a.Key == binderPathFolder.Name))
+                        {
+                            binderPathFolder.Parent.childFolders.Remove(item);
+                        }
                     }
-                }
-                if (treeViewItem.Parent != null && treeViewItem.Parent is TreeViewItem)
-                {
-                    TreeViewItem treeViewItemParent = (TreeViewItem)treeViewItem.Parent;
-                    treeViewItemParent.Items.Remove(treeViewItem);
+                    if (treeViewItem.Parent != null && treeViewItem.Parent is TreeViewItem)
+                    {
+                        TreeViewItem treeViewItemParent = (TreeViewItem)treeViewItem.Parent;
+                        treeViewItemParent.Items.Remove(treeViewItem);
+                    }
                 }
             }
         }
-
         private void MenuItem_Click_Add_File(object sender, RoutedEventArgs e)
         {
-            if (FileBrowser.SelectedItem is TreeViewItem)
+            if (!string.IsNullOrEmpty(LoadedBndPath) && FileBrowser.SelectedItem != null)
             {
-                var treeViewItemSelected = (TreeViewItem)FileBrowser.SelectedItem;
-                var binderPathFolderSelected = (BinderPathFolder)treeViewItemSelected.DataContext;
-                if (!binderPathFolderSelected.isFile)
+                if (FileBrowser.SelectedItem is TreeViewItem)
                 {
-                    List<BinderFile> binderFileList = DataContextViewModel.BinderPathFolderRoot.ToSFBinderFileList();
-                    if (binderFileList.Any())
+                    var treeViewItemSelected = (TreeViewItem)FileBrowser.SelectedItem;
+                    var binderPathFolderSelected = (BinderPathFolder)treeViewItemSelected.DataContext;
+                    if (!binderPathFolderSelected.isFile)
                     {
-                        var openFileDialog1 = new OpenFileDialog() { Title = "Select the file to add to the selected Folder" };
-                        if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                        List<BinderFile> binderFileList = DataContextViewModel.BinderPathFolderRoot.ToSFBinderFileList();
+                        if (binderFileList.Any())
                         {
-                            byte[] selectedFileBytes = File.ReadAllBytes(openFileDialog1.FileName);
-                            string selectedFileName = Path.GetFileName(openFileDialog1.FileName);
-                            string addedFileInternalPath = binderPathFolderSelected.FullPath + "\\" + selectedFileName;
-
-                            var dialog = new IDRequestDialog("Choose an ID for the file you're adding.", binderFileList.First().ID.ToString());
-                            dialog.Show();
-                            dialog.Closing += (sender, e) =>
+                            var openFileDialog1 = new OpenFileDialog() { Title = "Select the file to add to the selected Folder" };
+                            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                             {
-                                var d = sender as IDRequestDialog;
-                                if (!d.Canceled)
+                                byte[] selectedFileBytes = File.ReadAllBytes(openFileDialog1.FileName);
+                                string selectedFileName = Path.GetFileName(openFileDialog1.FileName);
+                                string addedFileInternalPath = binderPathFolderSelected.FullPath + "\\" + selectedFileName;
+
+                                var dialog = new IDRequestDialog("Choose an ID for the file you're adding.", binderFileList.First().ID.ToString());
+                                dialog.Show();
+                                dialog.Closing += (sender, e) =>
                                 {
-                                    if (Int32.TryParse(d.InputText, out int newID))
+                                    var d = sender as IDRequestDialog;
+                                    if (!d.Canceled)
                                     {
-                                        var newBinderFile = new BinderFile(binderFileList.First()) { Bytes = selectedFileBytes, ID = newID, Name = addedFileInternalPath };
-                                        var newBinderPathFolder = new BinderPathFolder(selectedFileName, binderPathFolderSelected) { File = newBinderFile };
-                                        binderPathFolderSelected.childFolders.Add(new KeyValuePair<string, BinderPathFolder>(selectedFileName, newBinderPathFolder));
-                                        //ReloadFileBrowser();
-                                        CreateTreeViewChildFromBinderPathFolder(newBinderPathFolder, treeViewItemSelected);
-                                        System.Windows.MessageBox.Show("File Added Successfully to the binder");
+                                        if (Int32.TryParse(d.InputText, out int newID))
+                                        {
+                                            var newBinderFile = new BinderFile(binderFileList.First()) { Bytes = selectedFileBytes, ID = newID, Name = addedFileInternalPath };
+                                            var newBinderPathFolder = new BinderPathFolder(selectedFileName, binderPathFolderSelected) { File = newBinderFile };
+                                            binderPathFolderSelected.childFolders.Add(new KeyValuePair<string, BinderPathFolder>(selectedFileName, newBinderPathFolder));
+                                            //ReloadFileBrowser();
+                                            CreateTreeViewChildFromBinderPathFolder(newBinderPathFolder, treeViewItemSelected);
+                                            System.Windows.MessageBox.Show("File Added Successfully to the binder");
+                                        }
                                     }
-                                }
-                            };
+                                };
+                            }
                         }
                     }
                 }
             }
         }
-
         private void MenuItem_Click_Add_Folder(object sender, RoutedEventArgs e)
         {
-
+            if (!string.IsNullOrEmpty(LoadedBndPath) && FileBrowser.SelectedItem != null)
+            {
+                if (FileBrowser.SelectedItem is TreeViewItem)
+                {
+                    var treeViewItemSelected = (TreeViewItem)FileBrowser.SelectedItem;
+                    var binderPathFolderSelected = (BinderPathFolder)treeViewItemSelected.DataContext;
+                    if (!binderPathFolderSelected.isFile)
+                    {
+                        List<BinderFile> binderFileList = DataContextViewModel.BinderPathFolderRoot.ToSFBinderFileList();
+                        if (binderFileList.Any())
+                        {
+                            var dialog = new IDRequestDialog("Choose a name for the folder you're adding", "Folder");
+                            dialog.ShowDialog();
+                            if (!dialog.Canceled)
+                            {
+                                var newBinderPathFolder = new BinderPathFolder(dialog.InputText, binderPathFolderSelected);
+                                binderPathFolderSelected.childFolders.Add(new KeyValuePair<string, BinderPathFolder>(dialog.InputText, newBinderPathFolder));
+                                CreateTreeViewChildFromBinderPathFolder(newBinderPathFolder, treeViewItemSelected);
+                                System.Windows.MessageBox.Show("Folder Added Successfully to the binder");
+                            }
+                        }
+                    }
+                }
+            }
         }
-
         private void SaveBinderToPath(string savePath)
         {
             var binder4 = DataContextViewModel.Binder4;
@@ -275,71 +293,106 @@ namespace FSBndAnimationRegister
                 DataContextViewModel.Binder3.Write(savePath);
             }
         }
-
         private void Menu_Item_Save_Simple(object sender, RoutedEventArgs e)
         {
             SaveBinderToPath(LoadedBndPath);
         }
-
         private void Menu_Item_Duplicate(object sender, RoutedEventArgs e)
         {
-            if (FileBrowser.SelectedItem is TreeViewItem)
+            if (!string.IsNullOrEmpty(LoadedBndPath) && FileBrowser.SelectedItem != null)
             {
-                var treeViewItemSelected = (TreeViewItem)FileBrowser.SelectedItem;
-                var binderPathFolderSelected = (BinderPathFolder)treeViewItemSelected.DataContext;
-                if (treeViewItemSelected.Parent is TreeViewItem && binderPathFolderSelected.isFile)
+                if (FileBrowser.SelectedItem is TreeViewItem)
                 {
-                    var treeViewItemSelectedParent = (TreeViewItem)treeViewItemSelected.Parent;
-                    var binderPathFolderSelectedParent = (BinderPathFolder)treeViewItemSelectedParent.DataContext;
-                    var indexOfSelectedTreeViewItem = treeViewItemSelectedParent.Items.IndexOf(treeViewItemSelected);
-                    List<BinderFile> binderFileList = DataContextViewModel.BinderPathFolderRoot.ToSFBinderFileList();
-                    if (binderFileList.Any())
+                    var treeViewItemSelected = (TreeViewItem)FileBrowser.SelectedItem;
+                    var binderPathFolderSelected = (BinderPathFolder)treeViewItemSelected.DataContext;
+                    if (treeViewItemSelected.Parent is TreeViewItem && binderPathFolderSelected.isFile)
                     {
-                        var newBinderFile = new BinderFile(binderPathFolderSelected.File) { ID = binderPathFolderSelected.File.ID + 1, Name = binderPathFolderSelected.File.Name + "Copy" };
-                        var newBinderPathFolder = new BinderPathFolder(binderPathFolderSelected.Name + "Copy", binderPathFolderSelectedParent) { File = newBinderFile };
-                        binderPathFolderSelectedParent.childFolders.Add(new KeyValuePair<string, BinderPathFolder>(binderPathFolderSelected.Name, newBinderPathFolder));
+                        var treeViewItemSelectedParent = (TreeViewItem)treeViewItemSelected.Parent;
+                        var binderPathFolderSelectedParent = (BinderPathFolder)treeViewItemSelectedParent.DataContext;
+                        var indexOfSelectedTreeViewItem = treeViewItemSelectedParent.Items.IndexOf(treeViewItemSelected);
+                        List<BinderFile> binderFileList = DataContextViewModel.BinderPathFolderRoot.ToSFBinderFileList();
+                        if (binderFileList.Any())
+                        {
+                            var newBinderFile = new BinderFile(binderPathFolderSelected.File) { ID = binderPathFolderSelected.File.ID + 1, Name = binderPathFolderSelected.File.Name + "Copy" };
+                            var newBinderPathFolder = new BinderPathFolder(binderPathFolderSelected.Name + "Copy", binderPathFolderSelectedParent) { File = newBinderFile };
+                            binderPathFolderSelectedParent.childFolders.Add(new KeyValuePair<string, BinderPathFolder>(binderPathFolderSelected.Name, newBinderPathFolder));
 
-                        CreateTreeViewChildFromBinderPathFolder(newBinderPathFolder, treeViewItemSelectedParent, indexOfSelectedTreeViewItem + 1);
-                        System.Windows.MessageBox.Show($"Successfully Duplicated File {binderPathFolderSelected.Name}");
+                            CreateTreeViewChildFromBinderPathFolder(newBinderPathFolder, treeViewItemSelectedParent, indexOfSelectedTreeViewItem + 1);
+                            System.Windows.MessageBox.Show($"Successfully Duplicated File {binderPathFolderSelected.Name}");
+                        }
                     }
                 }
+
             }
         }
-
         private void Menu_Item_Edit(object sender, RoutedEventArgs e)
         {
-            var selectedTreeViewItem = FileBrowser.SelectedItem as TreeViewItem;
-            var selectedBinderPathFolder = selectedTreeViewItem.DataContext as BinderPathFolder;
-            if (selectedTreeViewItem.Parent is TreeViewItem && selectedBinderPathFolder.isFile)
+            if (!string.IsNullOrEmpty(LoadedBndPath) && FileBrowser.SelectedItem != null)
             {
-                var treeViewItemSelectedParent = (TreeViewItem)selectedTreeViewItem.Parent;
-                var binderPathFolderSelectedParent = (BinderPathFolder)treeViewItemSelectedParent.DataContext;
-                var indexOfSelectedTreeViewItem = treeViewItemSelectedParent.Items.IndexOf(selectedTreeViewItem);
-                string ID = selectedBinderPathFolder.ID.ToString();
-                string Name = selectedBinderPathFolder.Name;
-                string Flags = selectedBinderPathFolder.File.Flags.ToString();
-                var dialog = new EditDialog("Edit File Popup", ID, Name, Flags);
-                dialog.ShowDialog();
-                if (!dialog.Canceled)
+                var selectedTreeViewItem = FileBrowser.SelectedItem as TreeViewItem;
+                var selectedBinderPathFolder = selectedTreeViewItem.DataContext as BinderPathFolder;
+                if (selectedTreeViewItem.Parent is TreeViewItem && selectedBinderPathFolder.isFile)
                 {
-                    treeViewItemSelectedParent.Items.Remove(selectedTreeViewItem);
-                    if (dialog.InputTextID != ID)
+                    var treeViewItemSelectedParent = (TreeViewItem)selectedTreeViewItem.Parent;
+                    var binderPathFolderSelectedParent = (BinderPathFolder)treeViewItemSelectedParent.DataContext;
+                    var indexOfSelectedTreeViewItem = treeViewItemSelectedParent.Items.IndexOf(selectedTreeViewItem);
+                    string ID = selectedBinderPathFolder.ID.ToString();
+                    string Name = selectedBinderPathFolder.Name;
+                    string Flags = ((int)selectedBinderPathFolder.File.Flags).ToString();
+                    var dialog = new EditDialog("Edit File Popup", ID, Name, Flags);
+                    dialog.ShowDialog();
+                    if (!dialog.Canceled)
                     {
-                        selectedBinderPathFolder.ID = Int32.Parse(dialog.InputTextID);
+                        treeViewItemSelectedParent.Items.Remove(selectedTreeViewItem);
+                        if (dialog.InputTextID != ID)
+                        {
+                            selectedBinderPathFolder.ID = Byte.Parse(dialog.InputTextID);
+                        }
+                        if (dialog.InputTextName != Name)
+                        {
+                            selectedBinderPathFolder.Name = dialog.InputTextName;
+                            selectedBinderPathFolder.File.Name = Path.GetDirectoryName(selectedBinderPathFolder.File.Name) + dialog.InputTextName;
+                        }
+                        if (dialog.InputTextFlags != Flags)
+                        {
+                            selectedBinderPathFolder.File.Flags = (Binder.FileFlags)Byte.Parse(dialog.InputTextFlags);
+                        }
+                        CreateTreeViewChildFromBinderPathFolder(selectedBinderPathFolder, treeViewItemSelectedParent, indexOfSelectedTreeViewItem);
                     }
-                    if (dialog.InputTextName != Name)
-                    {
-                        selectedBinderPathFolder.Name = dialog.InputTextName;
-                        selectedBinderPathFolder.File.Name = Path.GetDirectoryName(selectedBinderPathFolder.File.Name) + dialog.InputTextName;
-                    }
-                    CreateTreeViewChildFromBinderPathFolder(selectedBinderPathFolder, treeViewItemSelectedParent, indexOfSelectedTreeViewItem);
                 }
             }
         }
-
         private void Menu_Item_DebugReset(object sender, RoutedEventArgs e)
         {
             ReloadFileBrowser();
+        }
+        private void Menu_Item_ReplaceFile(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(LoadedBndPath) && FileBrowser.SelectedItem != null)
+            {
+                TreeViewItem selectedTreeViewItem = FileBrowser.SelectedItem as TreeViewItem;
+                BinderPathFolder selectedBinderPathFolder = selectedTreeViewItem.DataContext as BinderPathFolder;
+                if (selectedTreeViewItem.Parent is TreeViewItem && selectedBinderPathFolder.isFile)
+                {
+                    var treeViewItemSelectedParent = (TreeViewItem)selectedTreeViewItem.Parent;
+                    var binderPathFolderSelectedParent = (BinderPathFolder)treeViewItemSelectedParent.DataContext;
+                    var replaceDialog = new OpenFileDialog();
+                    if (replaceDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        byte[] fileBytes = File.ReadAllBytes(replaceDialog.FileName);
+                        var newFileName = Path.GetFileName(replaceDialog.FileName);
+
+                        selectedBinderPathFolder.File.Name = Path.GetDirectoryName(selectedBinderPathFolder.File.Name) + newFileName;
+                        selectedBinderPathFolder.File.Bytes = fileBytes;
+                        selectedBinderPathFolder.Name = newFileName;
+
+
+                        var indexOfSelectedTreeViewItem = treeViewItemSelectedParent.Items.IndexOf(selectedTreeViewItem);
+                        treeViewItemSelectedParent.Items.Remove(selectedTreeViewItem);
+                        CreateTreeViewChildFromBinderPathFolder(selectedBinderPathFolder, treeViewItemSelectedParent, indexOfSelectedTreeViewItem);
+                    }
+                }
+            }
         }
     }
 }
