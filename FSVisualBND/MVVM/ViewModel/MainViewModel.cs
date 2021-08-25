@@ -204,10 +204,10 @@ namespace FSBndAnimationRegister.MVVM.ViewModel
                         byte[] fileBytes = File.ReadAllBytes(replaceDialog.FileName);
                         var newFileName = Path.GetFileName(replaceDialog.FileName);
 
-                        selectedBinderPathFolder.File.Name = Path.GetDirectoryName(selectedBinderPathFolder.File.Name) + newFileName;
+                        selectedBinderPathFolder.File.Name = Path.Join(Path.GetDirectoryName(selectedBinderPathFolder.File.Name), newFileName);
                         selectedBinderPathFolder.File.Bytes = fileBytes;
                         selectedBinderPathFolder.Name = newFileName;
-
+                        
                         var indexOfSelectedTreeViewItem = treeViewItemSelectedParent.Items.IndexOf(selectedTreeViewItem);
                         treeViewItemSelectedParent.Items.Remove(selectedTreeViewItem);
                         CreateTreeViewChildFromBinderPathFolder(selectedBinderPathFolder, treeViewItemSelectedParent, indexOfSelectedTreeViewItem);
@@ -298,7 +298,7 @@ namespace FSBndAnimationRegister.MVVM.ViewModel
                         if (dialog.InputTextName != Name)
                         {
                             selectedBinderPathFolder.Name = dialog.InputTextName;
-                            selectedBinderPathFolder.File.Name = Path.GetDirectoryName(selectedBinderPathFolder.File.Name) + '\\' + dialog.InputTextName;
+                            selectedBinderPathFolder.File.Name = Path.Join(Path.GetDirectoryName(selectedBinderPathFolder.File.Name), dialog.InputTextName);
                         }
                         if (dialog.InputTextFlags != Flags)
                         {
