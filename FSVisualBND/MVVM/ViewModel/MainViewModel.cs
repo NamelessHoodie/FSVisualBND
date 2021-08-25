@@ -298,7 +298,7 @@ namespace FSBndAnimationRegister.MVVM.ViewModel
                         if (dialog.InputTextName != Name)
                         {
                             selectedBinderPathFolder.Name = dialog.InputTextName;
-                            selectedBinderPathFolder.File.Name = Path.GetDirectoryName(selectedBinderPathFolder.File.Name) + dialog.InputTextName;
+                            selectedBinderPathFolder.File.Name = Path.GetDirectoryName(selectedBinderPathFolder.File.Name) + '\\' + dialog.InputTextName;
                         }
                         if (dialog.InputTextFlags != Flags)
                         {
