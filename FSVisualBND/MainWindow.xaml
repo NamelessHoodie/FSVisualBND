@@ -14,13 +14,21 @@
         <viewmodel:MainViewModel/>
     </Window.DataContext>
 
-    
-    
+
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding CommandHotkeyBeginDuplicateFile}" Gesture="CTRL+D" />
+        <KeyBinding Command="{Binding CommandHotkeyBeginReplaceFile}" Gesture="CTRL+R" />
+        <KeyBinding Command="{Binding CommandHotkeyBeginDelete}" Gesture="Del" />
+        <KeyBinding Command="{Binding CommandHotkeyBeginEditFile}" Gesture="ALT+E" />
+        <KeyBinding Command="{Binding CommandHotkeyBeginAddFile}" Gesture="Ctrl+Shift+F" />
+        <KeyBinding Command="{Binding CommandHotkeyBeginAddDirectory}" Gesture="Ctrl+Shift+D" />
+    </Window.InputBindings>
+
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="21*"/>
-            <RowDefinition Height="19*"/>
-            <RowDefinition Height="394*"/>
+            <RowDefinition Height="18"/>
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -29,25 +37,25 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="99">
+        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
             <MenuItem Header="File">
                 <MenuItem Header="Load BND" Click="Button_Click_LoadBinderFile"/>
                 <MenuItem Header="Save BND" Click="Menu_Item_Save_Simple"/>
             </MenuItem>
-            <MenuItem Header="Edit">
-                <MenuItem Header="Duplicate" Click="Menu_Item_Duplicate"/>
-                <MenuItem Header="Replace File" Click="Menu_Item_ReplaceFile"/>
-                <MenuItem Header="Remove File/Folder" Click="MenuItem_Click_Remove"/>
-                <MenuItem Header="Edit" Click="Menu_Item_Edit"/>
-                <MenuItem Header="Add File" Click="MenuItem_Click_Add_File"/>
-                <MenuItem Header="Add Folder" Click="MenuItem_Click_Add_Folder"/>
+            <MenuItem x:Name="EditMenuItem" Header="Edit" IsEnabled="False">
+                <MenuItem Header="Duplicate" InputGestureText="Ctrl+D" Click="Menu_Item_Duplicate"/>
+                <MenuItem Header="Replace File" InputGestureText="CTRL+R" Click="Menu_Item_ReplaceFile"/>
+                <MenuItem Header="Remove File/Folder" InputGestureText="Del" Click="MenuItem_Click_Remove"/>
+                <MenuItem Header="Edit" InputGestureText="ALT+E"  Click="Menu_Item_Edit"/>
+                <MenuItem Header="Add File/Files" InputGestureText="Ctrl+Shift+F" Click="MenuItem_Click_Add_File"/>
+                <MenuItem Header="Add Directory" InputGestureText="Ctrl+Shift+D" Click="MenuItem_Click_Add_Folder"/>
             </MenuItem>
-            <MenuItem Header="Debug" Visibility="Hidden">
+            <MenuItem x:Name="DebugMenuItem" Header="Debug" Visibility="Hidden">
                 <MenuItem Header="DebugPrintRecursion" Click="MenuItem_Click_DebugPrintRecursion"/>
                 <MenuItem Header="DebugResetTree" Click="Menu_Item_DebugReset"/>
             </MenuItem>
         </Menu>
-        
-        <TreeView Background="Transparent" x:Name="FileBrowser"  Grid.ColumnSpan="4" SelectedItemChanged="FileBrowser_SelectedItemChanged" Grid.Row="1" Grid.RowSpan="2"/>
+
+        <TreeView Background="Transparent" x:Name="FileBrowser" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.ColumnSpan="4" SelectedItemChanged="FileBrowser_SelectedItemChanged" Grid.Row="1" Margin="0,7,0,0"/>
     </Grid>
 </Window>

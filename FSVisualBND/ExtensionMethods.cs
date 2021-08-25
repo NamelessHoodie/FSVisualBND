@@ -39,12 +39,25 @@ namespace FSBndAnimationRegister
             }
             return false;
         }
+        public static List<BinderFile> ToSFBinderFileListLocal(this BinderPathFolder binderPathRoot)
+        {
+            List<BinderFile> binderFileList = new List<BinderFile>();
+            foreach (var (name, childFolder) in binderPathRoot.childFolders)
+            {
+                if (childFolder.isFile)
+                {
+                    binderFileList.Add(childFolder.File);
+                }
+            }
+            binderFileList = binderFileList.OrderBy(binderFile => binderFile.ID).ToList();
+            return binderFileList;
+        }
         public static List<BinderFile> ToSFBinderFileList(this BinderPathFolder binderPathRoot)
         {
-            List<BinderFile> binderFile = new List<BinderFile>();
-            ToSFBinderFileListRecursive(binderPathRoot, ref binderFile);
-            binderFile = binderFile.OrderBy(binderFile => binderFile.ID).ToList();
-            return binderFile;
+            List<BinderFile> binderFileList = new List<BinderFile>();
+            ToSFBinderFileListRecursive(binderPathRoot, ref binderFileList);
+            binderFileList = binderFileList.OrderBy(binderFile => binderFile.ID).ToList();
+            return binderFileList;
         }
         private static void ToSFBinderFileListRecursive(this BinderPathFolder binderPathRoot, ref List<BinderFile> listToFill)
         {
